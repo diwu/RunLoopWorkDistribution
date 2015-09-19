@@ -14,6 +14,7 @@
 		506A0C8A1BAD09600084E276 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 506A0C891BAD09600084E276 /* Assets.xcassets */; };
 		506A0C8D1BAD09600084E276 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 506A0C8B1BAD09600084E276 /* LaunchScreen.storyboard */; };
 		506A0C951BAD717A0084E276 /* spaceship.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 506A0C941BAD717A0084E276 /* spaceship.jpg */; settings = {ASSET_TAGS = (); }; };
+		506A0C981BAD77F60084E276 /* DWURunLoopWorkDistribution.m in Sources */ = {isa = PBXBuildFile; fileRef = 506A0C971BAD77F60084E276 /* DWURunLoopWorkDistribution.m */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,8 @@
 		506A0C8C1BAD09600084E276 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		506A0C8E1BAD09600084E276 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		506A0C941BAD717A0084E276 /* spaceship.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = spaceship.jpg; sourceTree = "<group>"; };
+		506A0C961BAD77F60084E276 /* DWURunLoopWorkDistribution.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWURunLoopWorkDistribution.h; sourceTree = "<group>"; };
+		506A0C971BAD77F60084E276 /* DWURunLoopWorkDistribution.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWURunLoopWorkDistribution.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +73,8 @@
 				506A0C8B1BAD09600084E276 /* LaunchScreen.storyboard */,
 				506A0C8E1BAD09600084E276 /* Info.plist */,
 				506A0C7D1BAD09600084E276 /* Supporting Files */,
+				506A0C961BAD77F60084E276 /* DWURunLoopWorkDistribution.h */,
+				506A0C971BAD77F60084E276 /* DWURunLoopWorkDistribution.m */,
 			);
 			path = RunLoopWorkDistribution;
 			sourceTree = "<group>";
@@ -154,6 +159,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				506A0C851BAD09600084E276 /* ViewController.m in Sources */,
+				506A0C981BAD77F60084E276 /* DWURunLoopWorkDistribution.m in Sources */,
 				506A0C821BAD09600084E276 /* AppDelegate.m in Sources */,
 				506A0C7F1BAD09600084E276 /* main.m in Sources */,
 			);
