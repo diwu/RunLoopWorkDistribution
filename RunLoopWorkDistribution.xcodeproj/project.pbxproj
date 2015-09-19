@@ -13,6 +13,7 @@
 		506A0C881BAD09600084E276 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 506A0C861BAD09600084E276 /* Main.storyboard */; };
 		506A0C8A1BAD09600084E276 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 506A0C891BAD09600084E276 /* Assets.xcassets */; };
 		506A0C8D1BAD09600084E276 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 506A0C8B1BAD09600084E276 /* LaunchScreen.storyboard */; };
+		506A0C951BAD717A0084E276 /* spaceship.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 506A0C941BAD717A0084E276 /* spaceship.jpg */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		506A0C891BAD09600084E276 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		506A0C8C1BAD09600084E276 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		506A0C8E1BAD09600084E276 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		506A0C941BAD717A0084E276 /* spaceship.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = spaceship.jpg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +60,7 @@
 		506A0C7C1BAD09600084E276 /* RunLoopWorkDistribution */ = {
 			isa = PBXGroup;
 			children = (
+				506A0C941BAD717A0084E276 /* spaceship.jpg */,
 				506A0C801BAD09600084E276 /* AppDelegate.h */,
 				506A0C811BAD09600084E276 /* AppDelegate.m */,
 				506A0C831BAD09600084E276 /* ViewController.h */,
@@ -136,6 +139,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				506A0C951BAD717A0084E276 /* spaceship.jpg in Resources */,
 				506A0C8D1BAD09600084E276 /* LaunchScreen.storyboard in Resources */,
 				506A0C8A1BAD09600084E276 /* Assets.xcassets in Resources */,
 				506A0C881BAD09600084E276 /* Main.storyboard in Resources */,
