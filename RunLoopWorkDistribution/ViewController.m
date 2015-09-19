@@ -7,6 +7,8 @@
 //
 
 #import "ViewController.h"
+#import "ExampleCell.h"
+#import "DWURunLoopWorkDistribution.h"
 
 static NSString *IDENTIFIER = @"IDENTIFIER";
 
@@ -54,14 +56,25 @@ static CGFloat CELL_HEIGHT = 80.f;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 99;
+    return 399;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:IDENTIFIER];
-    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    ExampleCell *cell = [tableView dequeueReusableCellWithIdentifier:IDENTIFIER];
     [[cell viewWithTag:1] removeFromSuperview];
-    [cell.contentView addSubview:[ViewController _complicatedView]];
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    cell.currentIndexPath = indexPath;
+    __weak typeof(tableView) weakTableView = tableView;
+    [[DWURunLoopWorkDistribution sharedRunLoopWorkDistribution] addTask:^{
+        if ([[weakTableView visibleCells] indexOfObject:cell] != NSNotFound && cell.currentIndexPath.section == indexPath.section && cell.currentIndexPath.row == indexPath.row) {
+            UIView *complicatedView = [ViewController _complicatedView];
+            [UIView transitionWithView:cell.contentView duration:0.3 options:UIViewAnimationOptionTransitionCrossDissolve | UIViewAnimationOptionCurveEaseInOut animations:^{
+                [cell.contentView addSubview:complicatedView];
+            } completion:^(BOOL finished) {
+                
+            }];
+        }
+    } withKey:indexPath];
     return cell;
 }
 
@@ -86,7 +99,7 @@ static CGFloat CELL_HEIGHT = 80.f;
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    [self.exampleTableView registerClass:[UITableViewCell class] forCellReuseIdentifier:IDENTIFIER];
+    [self.exampleTableView registerClass:[ExampleCell class] forCellReuseIdentifier:IDENTIFIER];
 }
 
 - (void)didReceiveMemoryWarning {

@@ -14,4 +14,6 @@
 
 + (instancetype)sharedRunLoopWorkDistribution;
 
+- (void)addTask:(void(^)(void))task withKey:(id) key;
+
 @end

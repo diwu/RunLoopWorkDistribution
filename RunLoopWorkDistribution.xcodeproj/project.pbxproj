@@ -15,6 +15,7 @@
 		506A0C8D1BAD09600084E276 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 506A0C8B1BAD09600084E276 /* LaunchScreen.storyboard */; };
 		506A0C951BAD717A0084E276 /* spaceship.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 506A0C941BAD717A0084E276 /* spaceship.jpg */; settings = {ASSET_TAGS = (); }; };
 		506A0C981BAD77F60084E276 /* DWURunLoopWorkDistribution.m in Sources */ = {isa = PBXBuildFile; fileRef = 506A0C971BAD77F60084E276 /* DWURunLoopWorkDistribution.m */; settings = {ASSET_TAGS = (); }; };
+		506A0C9B1BAD9C9C0084E276 /* ExampleCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 506A0C9A1BAD9C9C0084E276 /* ExampleCell.m */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +32,8 @@
 		506A0C941BAD717A0084E276 /* spaceship.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = spaceship.jpg; sourceTree = "<group>"; };
 		506A0C961BAD77F60084E276 /* DWURunLoopWorkDistribution.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWURunLoopWorkDistribution.h; sourceTree = "<group>"; };
 		506A0C971BAD77F60084E276 /* DWURunLoopWorkDistribution.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWURunLoopWorkDistribution.m; sourceTree = "<group>"; };
+		506A0C991BAD9C9C0084E276 /* ExampleCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExampleCell.h; sourceTree = "<group>"; };
+		506A0C9A1BAD9C9C0084E276 /* ExampleCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExampleCell.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +78,8 @@
 				506A0C7D1BAD09600084E276 /* Supporting Files */,
 				506A0C961BAD77F60084E276 /* DWURunLoopWorkDistribution.h */,
 				506A0C971BAD77F60084E276 /* DWURunLoopWorkDistribution.m */,
+				506A0C991BAD9C9C0084E276 /* ExampleCell.h */,
+				506A0C9A1BAD9C9C0084E276 /* ExampleCell.m */,
 			);
 			path = RunLoopWorkDistribution;
 			sourceTree = "<group>";
@@ -160,6 +165,7 @@
 			files = (
 				506A0C851BAD09600084E276 /* ViewController.m in Sources */,
 				506A0C981BAD77F60084E276 /* DWURunLoopWorkDistribution.m in Sources */,
+				506A0C9B1BAD9C9C0084E276 /* ExampleCell.m in Sources */,
 				506A0C821BAD09600084E276 /* AppDelegate.m in Sources */,
 				506A0C7F1BAD09600084E276 /* main.m in Sources */,
 			);

@@ -30,7 +30,7 @@ static NSInteger MAX_CACHE_SIZE = 40;
     }
 }
 
-- (void)addTask: (void(^)(void))task withKey:(id) key{
+- (void)addTask:(void(^)(void))task withKey:(id) key{
     if ([self taskAlreadyAdded:key]) {
         return;
     }
@@ -92,6 +92,7 @@ static void _runLoopWorkDistributionCallback(CFRunLoopObserverRef observer, CFRu
         task();
         [runLoopWorkDistribution.tasks removeLastObject];
         [runLoopWorkDistribution.tasksKeys removeObjectAtIndex:runLoopWorkDistribution.tasksKeys.count-1];
+        break;
     }
 }
 
