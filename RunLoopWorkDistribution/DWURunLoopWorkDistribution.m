@@ -70,39 +70,55 @@ static NSInteger MAX_CACHE_SIZE = 40;
 }
 
 + (void)registerRunLoopWorkDistributionAsMainRunloopObserver:(DWURunLoopWorkDistribution *)runLoopWorkDistribution {
-    static CFRunLoopObserverRef observer;
+    static CFRunLoopObserverRef commonModesObserver;
+    static CFRunLoopObserverRef defaultModeObserver;
+    _registerObserver(commonModesObserver, 999, kCFRunLoopCommonModes, (__bridge void *)runLoopWorkDistribution, &commonModesRunLoopWorkDistributionCallback);
+    _registerObserver(defaultModeObserver, 1000, kCFRunLoopDefaultMode, (__bridge void *)runLoopWorkDistribution, &defaultModeRunLoopWorkDistributionCallback);
+}
+
+static void _registerObserver(CFRunLoopObserverRef observer, CFIndex order, CFStringRef mode, void *info, CFRunLoopObserverCallBack callback) {
     CFRunLoopRef runLoop = CFRunLoopGetCurrent();
     CFOptionFlags activities = (kCFRunLoopBeforeWaiting | // before the run loop starts sleeping
                                 kCFRunLoopExit);          // before exiting a runloop run
     CFRunLoopObserverContext context = {
         0,           // version
-        (__bridge void *)runLoopWorkDistribution,  // info
+        info,  // info
         &CFRetain,   // retain
         &CFRelease,  // release
         NULL         // copyDescription
     };
     
     observer = CFRunLoopObserverCreate(NULL,        // allocator
-                                       activities,  // activities
-                                       YES,         // repeats
-                                       1000,     // order after CA transaction commits
-                                       &_runLoopWorkDistributionCallback,  // callback
-                                       &context);   // context
-    CFRunLoopAddObserver(runLoop, observer, kCFRunLoopDefaultMode);
+                                                  activities,  // activities
+                                                  YES,         // repeats
+                                                  order,     // order after CA transaction commits
+                                                  callback,  // callback
+                                                  &context);   // context
+    CFRunLoopAddObserver(runLoop, observer, mode);
     CFRelease(observer);
 }
 
-static void _runLoopWorkDistributionCallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info)
+static void _runLoopWorkDistributionCallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info, BOOL isInCommonModes)
 {
     DWURunLoopWorkDistribution *runLoopWorkDistribution = (__bridge DWURunLoopWorkDistribution *)info;
-    while (runLoopWorkDistribution.tasks.count) {
-        DWURunLoopWorkDistributionUnit unit  = runLoopWorkDistribution.tasks.lastObject;
-        runLoopWorkDistribution.previousUnitResult = unit(runLoopWorkDistribution.previousUnitResult);
-        [runLoopWorkDistribution.tasks removeLastObject];
-        [runLoopWorkDistribution.tasksKeys removeObjectAtIndex:runLoopWorkDistribution.tasksKeys.count-1];
-        [runLoopWorkDistribution.priorities removeLastObject];
-        break;
+    if (runLoopWorkDistribution.tasks.count == 0) {
+        return;
+    } else if (isInCommonModes && [runLoopWorkDistribution.priorities.lastObject boolValue] == NO) {
+        return;
     }
+    DWURunLoopWorkDistributionUnit unit  = runLoopWorkDistribution.tasks.lastObject;
+    runLoopWorkDistribution.previousUnitResult = unit(runLoopWorkDistribution.previousUnitResult);
+    [runLoopWorkDistribution.tasks removeLastObject];
+    [runLoopWorkDistribution.tasksKeys removeObjectAtIndex:runLoopWorkDistribution.tasksKeys.count-1];
+    [runLoopWorkDistribution.priorities removeLastObject];
+}
+
+static void commonModesRunLoopWorkDistributionCallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
+    _runLoopWorkDistributionCallback(observer, activity, info, YES);
+}
+
+static void defaultModeRunLoopWorkDistributionCallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
+    _runLoopWorkDistributionCallback(observer, activity, info, NO);
 }
 
 @end
