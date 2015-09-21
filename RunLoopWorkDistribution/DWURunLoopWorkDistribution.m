@@ -18,6 +18,10 @@ static NSInteger MAX_CACHE_SIZE = 40;
 
 @property (nonatomic, strong) NSMutableOrderedSet *tasksKeys;
 
+@property (nonatomic, strong) NSMutableArray *priorities;
+
+@property (nonatomic, strong) id previousUnitResult;
+
 @end
 
 @implementation DWURunLoopWorkDistribution
@@ -30,15 +34,17 @@ static NSInteger MAX_CACHE_SIZE = 40;
     }
 }
 
-- (void)addTask:(void(^)(void))task withKey:(id) key{
+- (void)addTask:(DWURunLoopWorkDistributionUnit)unit withKey:(id) key urgent:(BOOL)urgent {
     if ([self taskAlreadyAdded:key]) {
         return;
     }
-    [self.tasks addObject:task];
+    [self.tasks addObject:unit];
     [self.tasksKeys addObject:key];
+    [self.priorities addObject:[NSNumber numberWithBool:urgent]];
     if (self.tasks.count > MAX_QUEUE_LENGTH) {
         [self.tasks removeObjectAtIndex:0];
         [self.tasksKeys removeObjectAtIndex:0];
+        [self.priorities removeObjectAtIndex:0];
     }
 }
 
@@ -47,6 +53,8 @@ static NSInteger MAX_CACHE_SIZE = 40;
     if ((self = [super init])) {
         _tasks = [NSMutableArray array];
         _tasksKeys = [NSMutableOrderedSet orderedSet];
+        _priorities = [NSMutableArray array];
+        _previousUnitResult = nil;
     }
     return self;
 }
@@ -88,10 +96,11 @@ static void _runLoopWorkDistributionCallback(CFRunLoopObserverRef observer, CFRu
 {
     DWURunLoopWorkDistribution *runLoopWorkDistribution = (__bridge DWURunLoopWorkDistribution *)info;
     while (runLoopWorkDistribution.tasks.count) {
-        void (^task)()  = runLoopWorkDistribution.tasks.lastObject;
-        task();
+        DWURunLoopWorkDistributionUnit unit  = runLoopWorkDistribution.tasks.lastObject;
+        runLoopWorkDistribution.previousUnitResult = unit(runLoopWorkDistribution.previousUnitResult);
         [runLoopWorkDistribution.tasks removeLastObject];
         [runLoopWorkDistribution.tasksKeys removeObjectAtIndex:runLoopWorkDistribution.tasksKeys.count-1];
+        [runLoopWorkDistribution.priorities removeLastObject];
         break;
     }
 }

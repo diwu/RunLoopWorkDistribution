@@ -8,12 +8,14 @@
 
 #import <Foundation/Foundation.h>
 
+typedef id(^DWURunLoopWorkDistributionUnit)(id info);
+
 @interface DWURunLoopWorkDistribution : NSObject
 
 + (void)registerRunLoopWorkDistributionAsMainRunloopObserver:(DWURunLoopWorkDistribution *)runLoopWorkDistribution;
 
 + (instancetype)sharedRunLoopWorkDistribution;
 
-- (void)addTask:(void(^)(void))task withKey:(id) key;
+- (void)addTask:(DWURunLoopWorkDistributionUnit)unit withKey:(id) key urgent:(BOOL)urgent;
 
 @end

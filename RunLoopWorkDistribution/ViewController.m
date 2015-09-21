@@ -12,7 +12,7 @@
 
 static NSString *IDENTIFIER = @"IDENTIFIER";
 
-static NSInteger NUM_OF_IMAGE_VIEW_PER_CELL = 5;
+static NSInteger NUM_OF_IMAGE_VIEW_PER_CELL = 1;
 
 static CGFloat CELL_HEIGHT = 80.f;
 
@@ -65,7 +65,7 @@ static CGFloat CELL_HEIGHT = 80.f;
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.currentIndexPath = indexPath;
     __weak typeof(tableView) weakTableView = tableView;
-    [[DWURunLoopWorkDistribution sharedRunLoopWorkDistribution] addTask:^{
+    [[DWURunLoopWorkDistribution sharedRunLoopWorkDistribution] addTask:(id)^(id previousUnitResult){
         if ([[weakTableView visibleCells] indexOfObject:cell] != NSNotFound && cell.currentIndexPath.section == indexPath.section && cell.currentIndexPath.row == indexPath.row) {
             UIView *complicatedView = [ViewController _complicatedView];
             [UIView transitionWithView:cell.contentView duration:0.3 options:UIViewAnimationOptionTransitionCrossDissolve | UIViewAnimationOptionCurveEaseInOut animations:^{
@@ -74,7 +74,8 @@ static CGFloat CELL_HEIGHT = 80.f;
                 
             }];
         }
-    } withKey:indexPath];
+        return nil;
+    } withKey:indexPath urgent:NO];
     return cell;
 }
 
