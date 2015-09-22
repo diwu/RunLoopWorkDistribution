@@ -22,11 +22,14 @@ static NSInteger MAX_QUEUE_LENGTH = 20;
 
 @property (nonatomic, strong) id previousUnitResult;
 
+#ifdef DWURunLoopWorkDistribution_DEBUG
 @property (nonatomic, assign, readwrite) NSUInteger randomNumber;
 
 @property (nonatomic, assign) NSUInteger whatCommonModesObserverSee;
 
 @property (nonatomic, assign) NSUInteger whatDefaultModeObserverSee;
+#endif
+@property (nonatomic, assign) BOOL skipNextDefaultModeCallback;
 
 @end
 
@@ -61,6 +64,7 @@ static NSInteger MAX_QUEUE_LENGTH = 20;
         _tasksKeys = [NSMutableOrderedSet orderedSet];
         _priorities = [NSMutableArray array];
         _previousUnitResult = nil;
+        _skipNextDefaultModeCallback = NO;
     }
     return self;
 }
@@ -118,12 +122,20 @@ static void _runLoopWorkDistributionCallback(CFRunLoopObserverRef observer, CFRu
         return;
     } else if (isInCommonModes && [runLoopWorkDistribution.priorities.lastObject boolValue] == NO) {
         return;
+    } else if (!isInCommonModes && runLoopWorkDistribution.skipNextDefaultModeCallback) {
+        runLoopWorkDistribution.skipNextDefaultModeCallback = NO;
+        return;
+    } else if (isInCommonModes) {
+        runLoopWorkDistribution.skipNextDefaultModeCallback = YES;
     }
     DWURunLoopWorkDistributionUnit unit  = runLoopWorkDistribution.tasks.lastObject;
     runLoopWorkDistribution.previousUnitResult = unit(runLoopWorkDistribution.previousUnitResult);
     [runLoopWorkDistribution.tasks removeLastObject];
     [runLoopWorkDistribution.tasksKeys removeObjectAtIndex:runLoopWorkDistribution.tasksKeys.count-1];
     [runLoopWorkDistribution.priorities removeLastObject];
+#if DWURunLoopWorkDistribution_DEBUG
+    NSLog(@"Task done. Remaining tasks count: %zd", runLoopWorkDistribution.tasks.count);
+#endif
 }
 
 static void commonModesRunLoopWorkDistributionCallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
