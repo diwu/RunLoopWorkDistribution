@@ -31,6 +31,8 @@ static NSInteger MAX_QUEUE_LENGTH = 20;
 #endif
 @property (nonatomic, assign) BOOL skipNextDefaultModeCallback;
 
+@property (nonatomic, strong) NSTimer *timer;
+
 @end
 
 @implementation DWURunLoopWorkDistribution
@@ -59,6 +61,10 @@ static NSInteger MAX_QUEUE_LENGTH = 20;
     }
 }
 
+- (void)timerFiredMethod:(NSTimer *)timer {
+    //We do nothing here
+}
+
 - (instancetype)init
 {
     if ((self = [super init])) {
@@ -67,6 +73,7 @@ static NSInteger MAX_QUEUE_LENGTH = 20;
         _priorities = [NSMutableArray array];
         _previousUnitResult = nil;
         _skipNextDefaultModeCallback = NO;
+        _timer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(timerFiredMethod:) userInfo:nil repeats:YES];
     }
     return self;
 }
@@ -121,9 +128,6 @@ static void _runLoopWorkDistributionCallback(CFRunLoopObserverRef observer, CFRu
 {
     DWURunLoopWorkDistribution *runLoopWorkDistribution = (__bridge DWURunLoopWorkDistribution *)info;
     if (runLoopWorkDistribution.tasks.count == 0) {
-#if DWURunLoopWorkDistribution_DEBUG
-        NSLog(@"skipping because count = 0");
-#endif
         return;
     } else if (isInCommonModes && [runLoopWorkDistribution.priorities.firstObject boolValue] == NO) {
         BOOL result = NO;
