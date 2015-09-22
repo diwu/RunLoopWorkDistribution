@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-typedef id(^DWURunLoopWorkDistributionUnit)(id info);
+typedef BOOL(^DWURunLoopWorkDistributionUnit)(void);
 
 @interface DWURunLoopWorkDistribution : NSObject
 

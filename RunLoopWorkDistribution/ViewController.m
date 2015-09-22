@@ -14,7 +14,7 @@ static NSString *IDENTIFIER = @"IDENTIFIER";
 
 static NSInteger NUM_OF_IMAGE_VIEW_PER_CELL = 1;
 
-static CGFloat CELL_HEIGHT = 120.f;
+static CGFloat CELL_HEIGHT = 150.f;
 
 @interface ViewController () <UITableViewDataSource, UITableViewDelegate>
 
@@ -55,6 +55,12 @@ static CGFloat CELL_HEIGHT = 120.f;
     return view;
 }
 
++ (void)task_4:(UITableViewCell *)cell indexPath:(NSIndexPath *)indexPath {
+    for (NSInteger i = 1; i <= 5; i++) {
+        [[cell.contentView viewWithTag:i] removeFromSuperview];
+    }
+}
+
 + (void)task_1:(UITableViewCell *)cell indexPath:(NSIndexPath *)indexPath {
     [[cell.contentView viewWithTag:1] removeFromSuperview];
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(5, 5, 300, 25)];
@@ -77,9 +83,29 @@ static CGFloat CELL_HEIGHT = 120.f;
     [cell.contentView addSubview:label];
     
     [[cell.contentView viewWithTag:3] removeFromSuperview];
-    UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(5, 55, 50, 50)];
+    UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(5, 55, 40, 40)];
     imageView.tag = 3;
     NSString *path = [[NSBundle mainBundle] pathForResource:@"small_apple_logo" ofType:@"jpg"];
+    UIImage *image = [UIImage imageWithContentsOfFile:path];
+    imageView.contentMode = UIViewContentModeScaleAspectFit;
+    imageView.image = image;
+    [cell.contentView addSubview:imageView];
+}
+
++ (void)task_3:(UITableViewCell *)cell indexPath:(NSIndexPath *)indexPath  {
+    [[cell.contentView viewWithTag:4] removeFromSuperview];
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(5, 95, 300, 25)];
+    label.backgroundColor = [UIColor clearColor];
+    label.textColor = [UIColor blackColor];
+    label.text = [NSString stringWithFormat:@"%zd - Drawing large image is low priority", indexPath.row];
+    label.font = [UIFont systemFontOfSize:13];
+    label.tag = 4;
+    [cell.contentView addSubview:label];
+    
+    [[cell.contentView viewWithTag:5] removeFromSuperview];
+    UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(100, 55, 40, 40)];
+    imageView.tag = 5;
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"spaceship" ofType:@"jpg"];
     UIImage *image = [UIImage imageWithContentsOfFile:path];
     imageView.contentMode = UIViewContentModeScaleAspectFit;
     imageView.image = image;
@@ -91,38 +117,26 @@ static CGFloat CELL_HEIGHT = 120.f;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    /*
-    ExampleCell *cell = [tableView dequeueReusableCellWithIdentifier:IDENTIFIER];
-    [[cell viewWithTag:1] removeFromSuperview];
-    cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    cell.currentIndexPath = indexPath;
-    __weak typeof(tableView) weakTableView = tableView;
-    [[DWURunLoopWorkDistribution sharedRunLoopWorkDistribution] addTask:(id)^(id previousUnitResult){
-        if ([[weakTableView visibleCells] indexOfObject:cell] != NSNotFound && cell.currentIndexPath.section == indexPath.section && cell.currentIndexPath.row == indexPath.row) {
-            UIView *complicatedView = [ViewController _complicatedView];
-            [UIView transitionWithView:cell.contentView duration:0.3 options:UIViewAnimationOptionTransitionCrossDissolve | UIViewAnimationOptionCurveEaseInOut animations:^{
-                [cell.contentView addSubview:complicatedView];
-            } completion:^(BOOL finished) {
-                
-            }];
-        }
-        return nil;
-    } withKey:indexPath urgent:NO];
-    return cell;
-     */
-    //-----
     ExampleCell *cell = [tableView dequeueReusableCellWithIdentifier:IDENTIFIER];
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.currentIndexPath = indexPath;
+    [ViewController task_4:cell indexPath:indexPath];
     [ViewController task_1:cell indexPath:indexPath];
-    [[DWURunLoopWorkDistribution sharedRunLoopWorkDistribution] addTask:^id(id info) {
+    [[DWURunLoopWorkDistribution sharedRunLoopWorkDistribution] addTask:^BOOL(void) {
         if (![cell.currentIndexPath isEqual:indexPath]) {
-            return nil;
+            return NO;
         }
         [ViewController task_2:cell indexPath:indexPath];
-        return nil;
+        return YES;
     } withKey:indexPath urgent:YES];
-    NSLog(@"common:  cell  CA, random number    is %zd\n", [DWURunLoopWorkDistribution sharedRunLoopWorkDistribution].randomNumber);
+    [[DWURunLoopWorkDistribution sharedRunLoopWorkDistribution] addTask:^BOOL(void) {
+        if (![cell.currentIndexPath isEqual:indexPath]) {
+            return NO;
+        }
+        [ViewController task_3:cell indexPath:indexPath];
+        return YES;
+    } withKey:indexPath urgent:NO];
+//    NSLog(@"common:  cell  CA, random number    is %zd\n", [DWURunLoopWorkDistribution sharedRunLoopWorkDistribution].randomNumber);
     return cell;
 }
 

@@ -16,7 +16,7 @@ static NSInteger MAX_QUEUE_LENGTH = 20;
 
 @property (nonatomic, strong) NSMutableArray *tasks;
 
-@property (nonatomic, strong) NSMutableOrderedSet *tasksKeys;
+@property (nonatomic, strong) NSMutableArray *tasksKeys;
 
 @property (nonatomic, strong) NSMutableArray *priorities;
 
@@ -35,6 +35,7 @@ static NSInteger MAX_QUEUE_LENGTH = 20;
 
 @implementation DWURunLoopWorkDistribution
 
+/*
 - (BOOL)taskAlreadyAdded: (id)key {
     if ([self.tasksKeys containsObject:key]) {
         return YES;
@@ -42,11 +43,12 @@ static NSInteger MAX_QUEUE_LENGTH = 20;
         return NO;
     }
 }
+ */
 
 - (void)addTask:(DWURunLoopWorkDistributionUnit)unit withKey:(id) key urgent:(BOOL)urgent {
-    if ([self taskAlreadyAdded:key]) {
-        return;
-    }
+//    if ([self taskAlreadyAdded:key]) {
+//        return;
+//    }
     [self.tasks addObject:unit];
     [self.tasksKeys addObject:key];
     [self.priorities addObject:[NSNumber numberWithBool:urgent]];
@@ -61,7 +63,7 @@ static NSInteger MAX_QUEUE_LENGTH = 20;
 {
     if ((self = [super init])) {
         _tasks = [NSMutableArray array];
-        _tasksKeys = [NSMutableOrderedSet orderedSet];
+        _tasksKeys = [NSMutableArray array];
         _priorities = [NSMutableArray array];
         _previousUnitResult = nil;
         _skipNextDefaultModeCallback = NO;
@@ -119,23 +121,50 @@ static void _runLoopWorkDistributionCallback(CFRunLoopObserverRef observer, CFRu
 {
     DWURunLoopWorkDistribution *runLoopWorkDistribution = (__bridge DWURunLoopWorkDistribution *)info;
     if (runLoopWorkDistribution.tasks.count == 0) {
+#if DWURunLoopWorkDistribution_DEBUG
+        NSLog(@"skipping because count = 0");
+#endif
         return;
     } else if (isInCommonModes && [runLoopWorkDistribution.priorities.firstObject boolValue] == NO) {
-        return;
-    } else if (!isInCommonModes && runLoopWorkDistribution.skipNextDefaultModeCallback) {
-        runLoopWorkDistribution.skipNextDefaultModeCallback = NO;
-        return;
-    } else if (isInCommonModes) {
-        runLoopWorkDistribution.skipNextDefaultModeCallback = YES;
-    }
-    DWURunLoopWorkDistributionUnit unit  = runLoopWorkDistribution.tasks.firstObject;
-    runLoopWorkDistribution.previousUnitResult = unit(runLoopWorkDistribution.previousUnitResult);
-    [runLoopWorkDistribution.tasks removeObjectAtIndex:0];
-    [runLoopWorkDistribution.tasksKeys removeObjectAtIndex:0];
-    [runLoopWorkDistribution.priorities removeObjectAtIndex:0];
+        BOOL result = NO;
+        NSInteger index = 0;
+        while (result == NO) {
+            if (index >= runLoopWorkDistribution.tasks.count) {
+                break;
+            }
+            if ([runLoopWorkDistribution.priorities[index] boolValue] == NO) {
+                index++;
+                continue;
+            }
+            DWURunLoopWorkDistributionUnit unit  = runLoopWorkDistribution.tasks[index];
+            result = unit();
+            [runLoopWorkDistribution.tasks removeObjectAtIndex:index];
+            [runLoopWorkDistribution.tasksKeys removeObjectAtIndex:index];
+            [runLoopWorkDistribution.priorities removeObjectAtIndex:index];
+            index++;
 #if DWURunLoopWorkDistribution_DEBUG
-    NSLog(@"Task done. Remaining tasks count: %zd", runLoopWorkDistribution.tasks.count);
+            NSLog(@"Task done. Remaining tasks count: %zd", runLoopWorkDistribution.tasks.count);
 #endif
+        }
+        return;
+    }
+//    } else if (!isInCommonModes && runLoopWorkDistribution.skipNextDefaultModeCallback) {
+//        runLoopWorkDistribution.skipNextDefaultModeCallback = NO;
+//        return;
+//    } else if (isInCommonModes) {
+//        runLoopWorkDistribution.skipNextDefaultModeCallback = YES;
+//    }
+    BOOL result = NO;
+    while (result == NO && runLoopWorkDistribution.tasks.count) {
+        DWURunLoopWorkDistributionUnit unit  = runLoopWorkDistribution.tasks.firstObject;
+        result = unit();
+        [runLoopWorkDistribution.tasks removeObjectAtIndex:0];
+        [runLoopWorkDistribution.tasksKeys removeObjectAtIndex:0];
+        [runLoopWorkDistribution.priorities removeObjectAtIndex:0];
+#if DWURunLoopWorkDistribution_DEBUG
+        NSLog(@"Task done. Remaining tasks count: %zd", runLoopWorkDistribution.tasks.count);
+#endif
+    }
 }
 
 static void commonModesRunLoopWorkDistributionCallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
@@ -143,7 +172,7 @@ static void commonModesRunLoopWorkDistributionCallback(CFRunLoopObserverRef obse
     DWURunLoopWorkDistribution *runLoopWorkDistribution = (__bridge DWURunLoopWorkDistribution *)info;
 //    runLoopWorkDistribution.randomNumber = arc4random_uniform(NSIntegerMax);
 //    runLoopWorkDistribution.whatCommonModesObserverSee = runLoopWorkDistribution.randomNumber;
-    NSLog(@"common:  see random number %zd", runLoopWorkDistribution.randomNumber);
+//    NSLog(@"common:  see random number %zd", runLoopWorkDistribution.randomNumber);
 #endif
     _runLoopWorkDistributionCallback(observer, activity, info, YES);
 }
@@ -166,15 +195,15 @@ static void afterWaitingCallback(CFRunLoopObserverRef observer, CFRunLoopActivit
 static void beforeWaitingBeforeCACallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
     DWURunLoopWorkDistribution *runLoopWorkDistribution = (__bridge DWURunLoopWorkDistribution *)info;
     runLoopWorkDistribution.randomNumber = arc4random_uniform(10000);
-    NSLog(@" ");
-    NSLog(@"------------------------------------------------");
-    NSLog(@"common:  set random number        to %zd", runLoopWorkDistribution.randomNumber);
+//    NSLog(@" ");
+//    NSLog(@"------------------------------------------------");
+//    NSLog(@"common:  set random number        to %zd", runLoopWorkDistribution.randomNumber);
 }
 static void beforeWaitingAfterCACallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
     DWURunLoopWorkDistribution *runLoopWorkDistribution = (__bridge DWURunLoopWorkDistribution *)info;
-    NSLog(@"common:  after CA, random number    is %zd\n", runLoopWorkDistribution.randomNumber);
-    NSLog(@"------------------------------------------------");
-    NSLog(@" ");
+//    NSLog(@"common:  after CA, random number    is %zd\n", runLoopWorkDistribution.randomNumber);
+//    NSLog(@"------------------------------------------------");
+//    NSLog(@" ");
     runLoopWorkDistribution.randomNumber = arc4random_uniform(10000);
 }
 #endif
