@@ -112,6 +112,7 @@ static CGFloat CELL_HEIGHT = 120.f;
      */
     //-----
     ExampleCell *cell = [tableView dequeueReusableCellWithIdentifier:IDENTIFIER];
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.currentIndexPath = indexPath;
     [ViewController task_1:cell indexPath:indexPath];
     [[DWURunLoopWorkDistribution sharedRunLoopWorkDistribution] addTask:^id(id info) {
