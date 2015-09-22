@@ -14,7 +14,7 @@ static NSString *IDENTIFIER = @"IDENTIFIER";
 
 static NSInteger NUM_OF_IMAGE_VIEW_PER_CELL = 1;
 
-static CGFloat CELL_HEIGHT = 150.f;
+static CGFloat CELL_HEIGHT = 120.f;
 
 @interface ViewController () <UITableViewDataSource, UITableViewDelegate>
 
