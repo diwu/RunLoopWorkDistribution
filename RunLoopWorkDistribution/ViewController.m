@@ -14,7 +14,7 @@ static NSString *IDENTIFIER = @"IDENTIFIER";
 
 static NSInteger NUM_OF_IMAGE_VIEW_PER_CELL = 1;
 
-static CGFloat CELL_HEIGHT = 80.f;
+static CGFloat CELL_HEIGHT = 120.f;
 
 @interface ViewController () <UITableViewDataSource, UITableViewDelegate>
 
@@ -55,11 +55,43 @@ static CGFloat CELL_HEIGHT = 80.f;
     return view;
 }
 
++ (void)task_1:(UITableViewCell *)cell indexPath:(NSIndexPath *)indexPath {
+    [[cell.contentView viewWithTag:1] removeFromSuperview];
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(5, 5, 300, 25)];
+    label.backgroundColor = [UIColor clearColor];
+    label.textColor = [UIColor blackColor];
+    label.text = [NSString stringWithFormat:@"%zd - Drawing index is top priority", indexPath.row];
+    label.font = [UIFont systemFontOfSize:13];
+    label.tag = 1;
+    [cell.contentView addSubview:label];
+}
+
++ (void)task_2:(UITableViewCell *)cell indexPath:(NSIndexPath *)indexPath  {
+    [[cell.contentView viewWithTag:2] removeFromSuperview];
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(5, 30, 300, 25)];
+    label.backgroundColor = [UIColor clearColor];
+    label.textColor = [UIColor blackColor];
+    label.text = [NSString stringWithFormat:@"%zd - Drawing small image is medium priority", indexPath.row];
+    label.font = [UIFont systemFontOfSize:13];
+    label.tag = 2;
+    [cell.contentView addSubview:label];
+    
+    [[cell.contentView viewWithTag:3] removeFromSuperview];
+    UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(5, 55, 50, 50)];
+    imageView.tag = 3;
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"small_apple_logo" ofType:@"jpg"];
+    UIImage *image = [UIImage imageWithContentsOfFile:path];
+    imageView.contentMode = UIViewContentModeScaleAspectFit;
+    imageView.image = image;
+    [cell.contentView addSubview:imageView];
+}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return 399;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    /*
     ExampleCell *cell = [tableView dequeueReusableCellWithIdentifier:IDENTIFIER];
     [[cell viewWithTag:1] removeFromSuperview];
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
@@ -76,6 +108,19 @@ static CGFloat CELL_HEIGHT = 80.f;
         }
         return nil;
     } withKey:indexPath urgent:NO];
+    return cell;
+     */
+    //-----
+    ExampleCell *cell = [tableView dequeueReusableCellWithIdentifier:IDENTIFIER];
+    cell.currentIndexPath = indexPath;
+    [ViewController task_1:cell indexPath:indexPath];
+    [[DWURunLoopWorkDistribution sharedRunLoopWorkDistribution] addTask:^id(id info) {
+        if (![cell.currentIndexPath isEqual:indexPath]) {
+            return nil;
+        }
+        [ViewController task_2:cell indexPath:indexPath];
+        return nil;
+    } withKey:indexPath urgent:YES];
     return cell;
 }
 
