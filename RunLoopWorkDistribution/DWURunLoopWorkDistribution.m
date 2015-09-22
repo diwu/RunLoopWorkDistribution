@@ -8,11 +8,9 @@
 
 #import "DWURunLoopWorkDistribution.h"
 
-#define DWURunLoopWorkDistribution_DEBUG 0
+#define DWURunLoopWorkDistribution_DEBUG 1
 
 static NSInteger MAX_QUEUE_LENGTH = 20;
-
-static NSInteger MAX_CACHE_SIZE = 40;
 
 @interface DWURunLoopWorkDistribution ()
 
@@ -24,7 +22,7 @@ static NSInteger MAX_CACHE_SIZE = 40;
 
 @property (nonatomic, strong) id previousUnitResult;
 
-@property (nonatomic, assign) NSUInteger randomNumber;
+@property (nonatomic, assign, readwrite) NSUInteger randomNumber;
 
 @property (nonatomic, assign) NSUInteger whatCommonModesObserverSee;
 
@@ -80,17 +78,21 @@ static NSInteger MAX_CACHE_SIZE = 40;
 + (void)registerRunLoopWorkDistributionAsMainRunloopObserver:(DWURunLoopWorkDistribution *)runLoopWorkDistribution {
     static CFRunLoopObserverRef commonModesObserver;
     static CFRunLoopObserverRef defaultModeObserver;
-    _registerObserver(commonModesObserver, 999, kCFRunLoopCommonModes, (__bridge void *)runLoopWorkDistribution, &commonModesRunLoopWorkDistributionCallback);
-    _registerObserver(defaultModeObserver, 1000, kCFRunLoopDefaultMode, (__bridge void *)runLoopWorkDistribution, &defaultModeRunLoopWorkDistributionCallback);
 #if DWURunLoopWorkDistribution_DEBUG
-    _registerObserverAfterWaiting(defaultModeObserver, 1000, kCFRunLoopCommonModes, (__bridge void *)runLoopWorkDistribution, &afterwaitingCallback);
+    static CFRunLoopObserverRef beforeWaitingBeforeCACommonModesObserver;
+    static CFRunLoopObserverRef beforeWaitingAfterCACommonModesObserver;
+#endif
+    _registerObserver(kCFRunLoopBeforeWaiting, commonModesObserver, 999, kCFRunLoopCommonModes, (__bridge void *)runLoopWorkDistribution, &commonModesRunLoopWorkDistributionCallback);
+    _registerObserver(kCFRunLoopBeforeWaiting, defaultModeObserver, 1000, kCFRunLoopDefaultMode, (__bridge void *)runLoopWorkDistribution, &defaultModeRunLoopWorkDistributionCallback);
+#if DWURunLoopWorkDistribution_DEBUG
+    _registerObserver(kCFRunLoopBeforeWaiting, defaultModeObserver, 1000, kCFRunLoopCommonModes, (__bridge void *)runLoopWorkDistribution, &afterWaitingCallback);
+    _registerObserver(kCFRunLoopBeforeWaiting, beforeWaitingBeforeCACommonModesObserver, NSIntegerMin + 999, kCFRunLoopCommonModes, (__bridge void *)runLoopWorkDistribution, &beforeWaitingBeforeCACallback);
+    _registerObserver(kCFRunLoopBeforeWaiting, beforeWaitingAfterCACommonModesObserver, NSIntegerMax - 999, kCFRunLoopCommonModes, (__bridge void *)runLoopWorkDistribution, &beforeWaitingAfterCACallback);
 #endif
 }
 
-static void _registerObserver(CFRunLoopObserverRef observer, CFIndex order, CFStringRef mode, void *info, CFRunLoopObserverCallBack callback) {
+static void _registerObserver(CFOptionFlags activities, CFRunLoopObserverRef observer, CFIndex order, CFStringRef mode, void *info, CFRunLoopObserverCallBack callback) {
     CFRunLoopRef runLoop = CFRunLoopGetCurrent();
-    CFOptionFlags activities = (kCFRunLoopBeforeWaiting | // before the run loop starts sleeping
-                                kCFRunLoopExit);          // before exiting a runloop run
     CFRunLoopObserverContext context = {
         0,           // version
         info,  // info
@@ -108,30 +110,6 @@ static void _registerObserver(CFRunLoopObserverRef observer, CFIndex order, CFSt
     CFRunLoopAddObserver(runLoop, observer, mode);
     CFRelease(observer);
 }
-
-#if DWURunLoopWorkDistribution_DEBUG
-static void _registerObserverAfterWaiting(CFRunLoopObserverRef observer, CFIndex order, CFStringRef mode, void *info, CFRunLoopObserverCallBack callback) {
-    CFRunLoopRef runLoop = CFRunLoopGetCurrent();
-    CFOptionFlags activities = (kCFRunLoopBeforeWaiting | // before the run loop starts sleeping
-                                kCFRunLoopExit);          // before exiting a runloop run
-    CFRunLoopObserverContext context = {
-        0,           // version
-        info,  // info
-        &CFRetain,   // retain
-        &CFRelease,  // release
-        NULL         // copyDescription
-    };
-    
-    observer = CFRunLoopObserverCreate(NULL,        // allocator
-                                       activities,  // activities
-                                       YES,         // repeats
-                                       order,
-                                       callback,  // callback
-                                       &context);   // context
-    CFRunLoopAddObserver(runLoop, observer, mode);
-    CFRelease(observer);
-}
-#endif
 
 static void _runLoopWorkDistributionCallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info, BOOL isInCommonModes)
 {
@@ -151,27 +129,41 @@ static void _runLoopWorkDistributionCallback(CFRunLoopObserverRef observer, CFRu
 static void commonModesRunLoopWorkDistributionCallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
 #if DWURunLoopWorkDistribution_DEBUG
     DWURunLoopWorkDistribution *runLoopWorkDistribution = (__bridge DWURunLoopWorkDistribution *)info;
-    runLoopWorkDistribution.randomNumber = arc4random_uniform(NSIntegerMax);
-    runLoopWorkDistribution.whatCommonModesObserverSee = runLoopWorkDistribution.randomNumber;
-    NSLog(@"common:  set random number to %zd", runLoopWorkDistribution.randomNumber);
+//    runLoopWorkDistribution.randomNumber = arc4random_uniform(NSIntegerMax);
+//    runLoopWorkDistribution.whatCommonModesObserverSee = runLoopWorkDistribution.randomNumber;
+    NSLog(@"common:  see random number %zd", runLoopWorkDistribution.randomNumber);
 #endif
     _runLoopWorkDistributionCallback(observer, activity, info, YES);
 }
 
 static void defaultModeRunLoopWorkDistributionCallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
 #if DWURunLoopWorkDistribution_DEBUG
-    DWURunLoopWorkDistribution *runLoopWorkDistribution = (__bridge DWURunLoopWorkDistribution *)info;
-    runLoopWorkDistribution.whatDefaultModeObserverSee = runLoopWorkDistribution.randomNumber;
-    NSLog(@"default: current random number is %zd", runLoopWorkDistribution.randomNumber);
-    NSCAssert(runLoopWorkDistribution.whatCommonModesObserverSee == runLoopWorkDistribution.whatDefaultModeObserverSee, @"Work Unit Out of Order!");
+//    DWURunLoopWorkDistribution *runLoopWorkDistribution = (__bridge DWURunLoopWorkDistribution *)info;
+//    runLoopWorkDistribution.whatDefaultModeObserverSee = runLoopWorkDistribution.randomNumber;
+//    NSLog(@"default: current random number is %zd", runLoopWorkDistribution.randomNumber);
+//    NSCAssert(runLoopWorkDistribution.whatCommonModesObserverSee == runLoopWorkDistribution.whatDefaultModeObserverSee, @"Work Unit Out of Order!");
 #endif
     _runLoopWorkDistributionCallback(observer, activity, info, NO);
 }
 
 #if DWURunLoopWorkDistribution_DEBUG
-static void afterwaitingCallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
+static void afterWaitingCallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
+//    DWURunLoopWorkDistribution *runLoopWorkDistribution = (__bridge DWURunLoopWorkDistribution *)info;
+//    runLoopWorkDistribution.randomNumber = arc4random_uniform(NSIntegerMax);
+}
+static void beforeWaitingBeforeCACallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
     DWURunLoopWorkDistribution *runLoopWorkDistribution = (__bridge DWURunLoopWorkDistribution *)info;
-    runLoopWorkDistribution.randomNumber = arc4random_uniform(NSIntegerMax);
+    runLoopWorkDistribution.randomNumber = arc4random_uniform(10000);
+    NSLog(@" ");
+    NSLog(@"------------------------------------------------");
+    NSLog(@"common:  set random number        to %zd", runLoopWorkDistribution.randomNumber);
+}
+static void beforeWaitingAfterCACallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
+    DWURunLoopWorkDistribution *runLoopWorkDistribution = (__bridge DWURunLoopWorkDistribution *)info;
+    NSLog(@"common:  after CA, random number    is %zd\n", runLoopWorkDistribution.randomNumber);
+    NSLog(@"------------------------------------------------");
+    NSLog(@" ");
+    runLoopWorkDistribution.randomNumber = arc4random_uniform(10000);
 }
 #endif
 

@@ -12,6 +12,8 @@ typedef id(^DWURunLoopWorkDistributionUnit)(id info);
 
 @interface DWURunLoopWorkDistribution : NSObject
 
+@property (nonatomic, assign, readonly) NSUInteger randomNumber;
+
 + (void)registerRunLoopWorkDistributionAsMainRunloopObserver:(DWURunLoopWorkDistribution *)runLoopWorkDistribution;
 
 + (instancetype)sharedRunLoopWorkDistribution;

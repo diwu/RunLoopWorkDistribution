@@ -121,6 +121,7 @@ static CGFloat CELL_HEIGHT = 120.f;
         [ViewController task_2:cell indexPath:indexPath];
         return nil;
     } withKey:indexPath urgent:YES];
+    NSLog(@"common:  cell  CA, random number    is %zd\n", [DWURunLoopWorkDistribution sharedRunLoopWorkDistribution].randomNumber);
     return cell;
 }
 
