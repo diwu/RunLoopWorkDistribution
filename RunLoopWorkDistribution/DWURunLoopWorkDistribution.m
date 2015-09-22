@@ -120,7 +120,7 @@ static void _runLoopWorkDistributionCallback(CFRunLoopObserverRef observer, CFRu
     DWURunLoopWorkDistribution *runLoopWorkDistribution = (__bridge DWURunLoopWorkDistribution *)info;
     if (runLoopWorkDistribution.tasks.count == 0) {
         return;
-    } else if (isInCommonModes && [runLoopWorkDistribution.priorities.lastObject boolValue] == NO) {
+    } else if (isInCommonModes && [runLoopWorkDistribution.priorities.firstObject boolValue] == NO) {
         return;
     } else if (!isInCommonModes && runLoopWorkDistribution.skipNextDefaultModeCallback) {
         runLoopWorkDistribution.skipNextDefaultModeCallback = NO;
@@ -128,11 +128,11 @@ static void _runLoopWorkDistributionCallback(CFRunLoopObserverRef observer, CFRu
     } else if (isInCommonModes) {
         runLoopWorkDistribution.skipNextDefaultModeCallback = YES;
     }
-    DWURunLoopWorkDistributionUnit unit  = runLoopWorkDistribution.tasks.lastObject;
+    DWURunLoopWorkDistributionUnit unit  = runLoopWorkDistribution.tasks.firstObject;
     runLoopWorkDistribution.previousUnitResult = unit(runLoopWorkDistribution.previousUnitResult);
-    [runLoopWorkDistribution.tasks removeLastObject];
-    [runLoopWorkDistribution.tasksKeys removeObjectAtIndex:runLoopWorkDistribution.tasksKeys.count-1];
-    [runLoopWorkDistribution.priorities removeLastObject];
+    [runLoopWorkDistribution.tasks removeObjectAtIndex:0];
+    [runLoopWorkDistribution.tasksKeys removeObjectAtIndex:0];
+    [runLoopWorkDistribution.priorities removeObjectAtIndex:0];
 #if DWURunLoopWorkDistribution_DEBUG
     NSLog(@"Task done. Remaining tasks count: %zd", runLoopWorkDistribution.tasks.count);
 #endif
