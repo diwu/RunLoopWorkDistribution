@@ -38,7 +38,7 @@
 - (instancetype)init
 {
     if ((self = [super init])) {
-        _maximumQueueLength = 20;
+        _maximumQueueLength = 30;
         _tasks = [NSMutableArray array];
         _tasksKeys = [NSMutableArray array];
         _timer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(timerFiredMethod:) userInfo:nil repeats:YES];
