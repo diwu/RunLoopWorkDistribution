@@ -7,6 +7,7 @@
 //
 
 #import "DWURunLoopWorkDistribution.h"
+#import <objc/runtime.h>
 
 #define DWURunLoopWorkDistribution_DEBUG 1
 
@@ -102,6 +103,21 @@ static void _runLoopWorkDistributionCallback(CFRunLoopObserverRef observer, CFRu
 
 static void defaultModeRunLoopWorkDistributionCallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
     _runLoopWorkDistributionCallback(observer, activity, info);
+}
+
+@end
+
+@implementation UITableViewCell (DWURunLoopWorkDistribution)
+
+@dynamic currentIndexPath;
+
+- (NSIndexPath *)currentIndexPath {
+    NSIndexPath *indexPath = objc_getAssociatedObject(self, @selector(currentIndexPath));
+    return indexPath;
+}
+
+- (void)setCurrentIndexPath:(NSIndexPath *)currentIndexPath {
+    objc_setAssociatedObject(self, @selector(currentIndexPath), currentIndexPath, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 @end

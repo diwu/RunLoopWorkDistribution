@@ -6,7 +6,7 @@
 //  Copyright © 2015 Di Wu. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 typedef BOOL(^DWURunLoopWorkDistributionUnit)(void);
 
@@ -21,5 +21,11 @@ typedef BOOL(^DWURunLoopWorkDistributionUnit)(void);
 - (void)addTask:(DWURunLoopWorkDistributionUnit)unit withKey:(id)key;
 
 - (void)removeAllTasks;
+
+@end
+
+@interface UITableViewCell (DWURunLoopWorkDistribution)
+
+@property (nonatomic, strong) NSIndexPath *currentIndexPath;
 
 @end

@@ -3,5 +3,4 @@
 //
 
 #import "DWURunLoopWorkDistribution.h"
-#import "ExampleCell.h"
 #import "ViewController.h"

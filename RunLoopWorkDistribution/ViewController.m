@@ -7,7 +7,6 @@
 //
 
 #import "ViewController.h"
-#import "ExampleCell.h"
 #import "DWURunLoopWorkDistribution.h"
 
 static NSString *IDENTIFIER = @"IDENTIFIER";
@@ -83,7 +82,7 @@ static CGFloat CELL_HEIGHT = 135.f;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    ExampleCell *cell = [tableView dequeueReusableCellWithIdentifier:IDENTIFIER];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:IDENTIFIER];
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.currentIndexPath = indexPath;
     [ViewController task_5:cell indexPath:indexPath];
@@ -133,7 +132,7 @@ static CGFloat CELL_HEIGHT = 135.f;
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    [self.exampleTableView registerClass:[ExampleCell class] forCellReuseIdentifier:IDENTIFIER];
+    [self.exampleTableView registerClass:[UITableViewCell class] forCellReuseIdentifier:IDENTIFIER];
 }
 
 - (void)didReceiveMemoryWarning {

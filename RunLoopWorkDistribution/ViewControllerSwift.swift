@@ -25,13 +25,13 @@ class ViewControllerSwift: UIViewController, UITableViewDelegate, UITableViewDat
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        exampleTableView?.registerClass(ExampleCell.self, forCellReuseIdentifier: ViewControllerSwift.IDENTIFIER)
+        exampleTableView?.registerClass(UITableViewCell.self, forCellReuseIdentifier: ViewControllerSwift.IDENTIFIER)
     }
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         return ViewControllerSwift.CELL_HEIGHT
     }
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell: ExampleCell = tableView.dequeueReusableCellWithIdentifier(ViewControllerSwift.IDENTIFIER) as! ExampleCell
+        let cell: UITableViewCell = tableView.dequeueReusableCellWithIdentifier(ViewControllerSwift.IDENTIFIER)!
         cell.selectionStyle = .None
         cell.currentIndexPath = indexPath
         ViewController.task_5(cell, indexPath: indexPath)
