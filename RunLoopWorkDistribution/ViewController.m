@@ -24,37 +24,6 @@ static CGFloat CELL_HEIGHT = 120.f;
 
 @implementation ViewController
 
-+ (CGRect)_frameForImageViewWithIndex:(NSInteger)index {
-    static CGFloat width = 0;
-    if (width == 0) {
-        width = CGRectGetWidth([UIScreen mainScreen].bounds) / (CGFloat)NUM_OF_IMAGE_VIEW_PER_CELL;
-    }
-    return CGRectMake(index * width, 0, width, CELL_HEIGHT);
-}
-
-+ (CGRect)_frameForComplicatedView {
-    static CGFloat width = 0;
-    if (width == 0) {
-        width = CGRectGetWidth([UIScreen mainScreen].bounds);
-    }
-    return CGRectMake(0, 0, width, CELL_HEIGHT);
-}
-
-+ (UIView *)_complicatedView {
-    UIView *view = [UIView new];
-    view.tag = 1;
-    view.frame = [ViewController _frameForComplicatedView];
-    for (NSInteger i = 0; i < NUM_OF_IMAGE_VIEW_PER_CELL; i++) {
-        NSString *path = [[NSBundle mainBundle] pathForResource:@"spaceship" ofType:@"jpg"];
-        UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageWithContentsOfFile:path]];
-        imageView.contentMode = UIViewContentModeScaleAspectFit;
-        imageView.tag = 1;
-        imageView.frame = [ViewController _frameForImageViewWithIndex:i];
-        [view addSubview:imageView];
-    }
-    return view;
-}
-
 + (void)task_4:(UITableViewCell *)cell indexPath:(NSIndexPath *)indexPath {
     for (NSInteger i = 1; i <= 5; i++) {
         [[cell.contentView viewWithTag:i] removeFromSuperview];
@@ -72,26 +41,6 @@ static CGFloat CELL_HEIGHT = 120.f;
     [cell.contentView addSubview:label];
 }
 
-+ (void)task_2:(UITableViewCell *)cell indexPath:(NSIndexPath *)indexPath  {
-    [[cell.contentView viewWithTag:2] removeFromSuperview];
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(5, 30, 300, 25)];
-    label.backgroundColor = [UIColor clearColor];
-    label.textColor = [UIColor blackColor];
-    label.text = [NSString stringWithFormat:@"%zd - Drawing small image is medium priority", indexPath.row];
-    label.font = [UIFont systemFontOfSize:13];
-    label.tag = 2;
-    [cell.contentView addSubview:label];
-    
-    [[cell.contentView viewWithTag:3] removeFromSuperview];
-    UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(5, 55, 40, 40)];
-    imageView.tag = 3;
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"small_apple_logo" ofType:@"jpg"];
-    UIImage *image = [UIImage imageWithContentsOfFile:path];
-    imageView.contentMode = UIViewContentModeScaleAspectFit;
-    imageView.image = image;
-    [cell.contentView addSubview:imageView];
-}
-
 + (void)task_3:(UITableViewCell *)cell indexPath:(NSIndexPath *)indexPath  {
     [[cell.contentView viewWithTag:4] removeFromSuperview];
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(5, 95, 300, 25)];
@@ -103,7 +52,7 @@ static CGFloat CELL_HEIGHT = 120.f;
     [cell.contentView addSubview:label];
     
     [[cell.contentView viewWithTag:5] removeFromSuperview];
-    UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(100, 55, 40, 40)];
+    UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(5, 20, 85, 85)];
     imageView.tag = 5;
     NSString *path = [[NSBundle mainBundle] pathForResource:@"spaceship" ofType:@"jpg"];
     UIImage *image = [UIImage imageWithContentsOfFile:path];
@@ -126,17 +75,9 @@ static CGFloat CELL_HEIGHT = 120.f;
         if (![cell.currentIndexPath isEqual:indexPath]) {
             return NO;
         }
-        [ViewController task_2:cell indexPath:indexPath];
-        return YES;
-    } withKey:indexPath urgent:YES];
-    [[DWURunLoopWorkDistribution sharedRunLoopWorkDistribution] addTask:^BOOL(void) {
-        if (![cell.currentIndexPath isEqual:indexPath]) {
-            return NO;
-        }
         [ViewController task_3:cell indexPath:indexPath];
         return YES;
-    } withKey:indexPath urgent:NO];
-//    NSLog(@"common:  cell  CA, random number    is %zd\n", [DWURunLoopWorkDistribution sharedRunLoopWorkDistribution].randomNumber);
+    } withKey:indexPath];
     return cell;
 }
 

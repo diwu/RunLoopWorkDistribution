@@ -10,26 +10,11 @@
 
 #define DWURunLoopWorkDistribution_DEBUG 1
 
-static NSInteger MAX_QUEUE_LENGTH = 20;
-
 @interface DWURunLoopWorkDistribution ()
 
 @property (nonatomic, strong) NSMutableArray *tasks;
 
 @property (nonatomic, strong) NSMutableArray *tasksKeys;
-
-@property (nonatomic, strong) NSMutableArray *priorities;
-
-@property (nonatomic, strong) id previousUnitResult;
-
-#ifdef DWURunLoopWorkDistribution_DEBUG
-@property (nonatomic, assign, readwrite) NSUInteger randomNumber;
-
-@property (nonatomic, assign) NSUInteger whatCommonModesObserverSee;
-
-@property (nonatomic, assign) NSUInteger whatDefaultModeObserverSee;
-#endif
-@property (nonatomic, assign) BOOL skipNextDefaultModeCallback;
 
 @property (nonatomic, strong) NSTimer *timer;
 
@@ -37,27 +22,12 @@ static NSInteger MAX_QUEUE_LENGTH = 20;
 
 @implementation DWURunLoopWorkDistribution
 
-/*
-- (BOOL)taskAlreadyAdded: (id)key {
-    if ([self.tasksKeys containsObject:key]) {
-        return YES;
-    } else {
-        return NO;
-    }
-}
- */
-
-- (void)addTask:(DWURunLoopWorkDistributionUnit)unit withKey:(id) key urgent:(BOOL)urgent {
-//    if ([self taskAlreadyAdded:key]) {
-//        return;
-//    }
+- (void)addTask:(DWURunLoopWorkDistributionUnit)unit withKey:(id)key{
     [self.tasks addObject:unit];
     [self.tasksKeys addObject:key];
-    [self.priorities addObject:[NSNumber numberWithBool:urgent]];
-    if (self.tasks.count > MAX_QUEUE_LENGTH) {
+    if (self.tasks.count > self.maximumQueueLength) {
         [self.tasks removeObjectAtIndex:0];
         [self.tasksKeys removeObjectAtIndex:0];
-        [self.priorities removeObjectAtIndex:0];
     }
 }
 
@@ -68,11 +38,9 @@ static NSInteger MAX_QUEUE_LENGTH = 20;
 - (instancetype)init
 {
     if ((self = [super init])) {
+        _maximumQueueLength = 20;
         _tasks = [NSMutableArray array];
         _tasksKeys = [NSMutableArray array];
-        _priorities = [NSMutableArray array];
-        _previousUnitResult = nil;
-        _skipNextDefaultModeCallback = NO;
         _timer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(timerFiredMethod:) userInfo:nil repeats:YES];
     }
     return self;
@@ -89,127 +57,46 @@ static NSInteger MAX_QUEUE_LENGTH = 20;
 }
 
 + (void)registerRunLoopWorkDistributionAsMainRunloopObserver:(DWURunLoopWorkDistribution *)runLoopWorkDistribution {
-    static CFRunLoopObserverRef commonModesObserver;
     static CFRunLoopObserverRef defaultModeObserver;
-#if DWURunLoopWorkDistribution_DEBUG
-    static CFRunLoopObserverRef beforeWaitingBeforeCACommonModesObserver;
-    static CFRunLoopObserverRef beforeWaitingAfterCACommonModesObserver;
-#endif
-    _registerObserver(kCFRunLoopBeforeWaiting, commonModesObserver, 999, kCFRunLoopCommonModes, (__bridge void *)runLoopWorkDistribution, &commonModesRunLoopWorkDistributionCallback);
-    _registerObserver(kCFRunLoopBeforeWaiting, defaultModeObserver, 1000, kCFRunLoopDefaultMode, (__bridge void *)runLoopWorkDistribution, &defaultModeRunLoopWorkDistributionCallback);
-#if DWURunLoopWorkDistribution_DEBUG
-    _registerObserver(kCFRunLoopBeforeWaiting, defaultModeObserver, 1000, kCFRunLoopCommonModes, (__bridge void *)runLoopWorkDistribution, &afterWaitingCallback);
-    _registerObserver(kCFRunLoopBeforeWaiting, beforeWaitingBeforeCACommonModesObserver, NSIntegerMin + 999, kCFRunLoopCommonModes, (__bridge void *)runLoopWorkDistribution, &beforeWaitingBeforeCACallback);
-    _registerObserver(kCFRunLoopBeforeWaiting, beforeWaitingAfterCACommonModesObserver, NSIntegerMax - 999, kCFRunLoopCommonModes, (__bridge void *)runLoopWorkDistribution, &beforeWaitingAfterCACallback);
-#endif
+    _registerObserver(kCFRunLoopBeforeWaiting, defaultModeObserver, NSIntegerMax - 999, kCFRunLoopDefaultMode, (__bridge void *)runLoopWorkDistribution, &defaultModeRunLoopWorkDistributionCallback);
 }
 
 static void _registerObserver(CFOptionFlags activities, CFRunLoopObserverRef observer, CFIndex order, CFStringRef mode, void *info, CFRunLoopObserverCallBack callback) {
     CFRunLoopRef runLoop = CFRunLoopGetCurrent();
     CFRunLoopObserverContext context = {
-        0,           // version
-        info,  // info
-        &CFRetain,   // retain
-        &CFRelease,  // release
-        NULL         // copyDescription
+        0,
+        info,
+        &CFRetain,
+        &CFRelease,
+        NULL
     };
-    
-    observer = CFRunLoopObserverCreate(NULL,        // allocator
-                                                  activities,  // activities
-                                                  YES,         // repeats
-                                                  order,
-                                                  callback,  // callback
-                                                  &context);   // context
+    observer = CFRunLoopObserverCreate(     NULL,
+                                            activities,
+                                            YES,
+                                            order,
+                                            callback,
+                                            &context);
     CFRunLoopAddObserver(runLoop, observer, mode);
     CFRelease(observer);
 }
 
-static void _runLoopWorkDistributionCallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info, BOOL isInCommonModes)
+static void _runLoopWorkDistributionCallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info)
 {
     DWURunLoopWorkDistribution *runLoopWorkDistribution = (__bridge DWURunLoopWorkDistribution *)info;
     if (runLoopWorkDistribution.tasks.count == 0) {
         return;
-    } else if (isInCommonModes && [runLoopWorkDistribution.priorities.firstObject boolValue] == NO) {
-        BOOL result = NO;
-        NSInteger index = 0;
-        while (result == NO) {
-            if (index >= runLoopWorkDistribution.tasks.count) {
-                break;
-            }
-            if ([runLoopWorkDistribution.priorities[index] boolValue] == NO) {
-                index++;
-                continue;
-            }
-            DWURunLoopWorkDistributionUnit unit  = runLoopWorkDistribution.tasks[index];
-            result = unit();
-            [runLoopWorkDistribution.tasks removeObjectAtIndex:index];
-            [runLoopWorkDistribution.tasksKeys removeObjectAtIndex:index];
-            [runLoopWorkDistribution.priorities removeObjectAtIndex:index];
-            index++;
-#if DWURunLoopWorkDistribution_DEBUG
-            NSLog(@"Task done. Remaining tasks count: %zd", runLoopWorkDistribution.tasks.count);
-#endif
-        }
-        return;
     }
-//    } else if (!isInCommonModes && runLoopWorkDistribution.skipNextDefaultModeCallback) {
-//        runLoopWorkDistribution.skipNextDefaultModeCallback = NO;
-//        return;
-//    } else if (isInCommonModes) {
-//        runLoopWorkDistribution.skipNextDefaultModeCallback = YES;
-//    }
     BOOL result = NO;
     while (result == NO && runLoopWorkDistribution.tasks.count) {
         DWURunLoopWorkDistributionUnit unit  = runLoopWorkDistribution.tasks.firstObject;
         result = unit();
         [runLoopWorkDistribution.tasks removeObjectAtIndex:0];
         [runLoopWorkDistribution.tasksKeys removeObjectAtIndex:0];
-        [runLoopWorkDistribution.priorities removeObjectAtIndex:0];
-#if DWURunLoopWorkDistribution_DEBUG
-        NSLog(@"Task done. Remaining tasks count: %zd", runLoopWorkDistribution.tasks.count);
-#endif
     }
 }
 
-static void commonModesRunLoopWorkDistributionCallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
-#if DWURunLoopWorkDistribution_DEBUG
-    DWURunLoopWorkDistribution *runLoopWorkDistribution = (__bridge DWURunLoopWorkDistribution *)info;
-//    runLoopWorkDistribution.randomNumber = arc4random_uniform(NSIntegerMax);
-//    runLoopWorkDistribution.whatCommonModesObserverSee = runLoopWorkDistribution.randomNumber;
-//    NSLog(@"common:  see random number %zd", runLoopWorkDistribution.randomNumber);
-#endif
-    _runLoopWorkDistributionCallback(observer, activity, info, YES);
-}
-
 static void defaultModeRunLoopWorkDistributionCallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
-#if DWURunLoopWorkDistribution_DEBUG
-//    DWURunLoopWorkDistribution *runLoopWorkDistribution = (__bridge DWURunLoopWorkDistribution *)info;
-//    runLoopWorkDistribution.whatDefaultModeObserverSee = runLoopWorkDistribution.randomNumber;
-//    NSLog(@"default: current random number is %zd", runLoopWorkDistribution.randomNumber);
-//    NSCAssert(runLoopWorkDistribution.whatCommonModesObserverSee == runLoopWorkDistribution.whatDefaultModeObserverSee, @"Work Unit Out of Order!");
-#endif
-    _runLoopWorkDistributionCallback(observer, activity, info, NO);
+    _runLoopWorkDistributionCallback(observer, activity, info);
 }
-
-#if DWURunLoopWorkDistribution_DEBUG
-static void afterWaitingCallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
-//    DWURunLoopWorkDistribution *runLoopWorkDistribution = (__bridge DWURunLoopWorkDistribution *)info;
-//    runLoopWorkDistribution.randomNumber = arc4random_uniform(NSIntegerMax);
-}
-static void beforeWaitingBeforeCACallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
-    DWURunLoopWorkDistribution *runLoopWorkDistribution = (__bridge DWURunLoopWorkDistribution *)info;
-    runLoopWorkDistribution.randomNumber = arc4random_uniform(10000);
-//    NSLog(@" ");
-//    NSLog(@"------------------------------------------------");
-//    NSLog(@"common:  set random number        to %zd", runLoopWorkDistribution.randomNumber);
-}
-static void beforeWaitingAfterCACallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
-    DWURunLoopWorkDistribution *runLoopWorkDistribution = (__bridge DWURunLoopWorkDistribution *)info;
-//    NSLog(@"common:  after CA, random number    is %zd\n", runLoopWorkDistribution.randomNumber);
-//    NSLog(@"------------------------------------------------");
-//    NSLog(@" ");
-    runLoopWorkDistribution.randomNumber = arc4random_uniform(10000);
-}
-#endif
 
 @end

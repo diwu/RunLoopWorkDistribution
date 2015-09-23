@@ -12,12 +12,12 @@ typedef BOOL(^DWURunLoopWorkDistributionUnit)(void);
 
 @interface DWURunLoopWorkDistribution : NSObject
 
-@property (nonatomic, assign, readonly) NSUInteger randomNumber;
+@property (nonatomic, assign) NSUInteger maximumQueueLength;
 
 + (void)registerRunLoopWorkDistributionAsMainRunloopObserver:(DWURunLoopWorkDistribution *)runLoopWorkDistribution;
 
 + (instancetype)sharedRunLoopWorkDistribution;
 
-- (void)addTask:(DWURunLoopWorkDistributionUnit)unit withKey:(id) key urgent:(BOOL)urgent;
+- (void)addTask:(DWURunLoopWorkDistributionUnit)unit withKey:(id)key;
 
 @end
