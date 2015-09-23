@@ -8,17 +8,19 @@
 
 /* Begin PBXBuildFile section */
 		504980B21BB27D190046A918 /* ViewControllerSwift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504980B11BB27D190046A918 /* ViewControllerSwift.swift */; };
+		504980B51BB29E5B0046A918 /* DWURunLoopWorkDistribution.m in Sources */ = {isa = PBXBuildFile; fileRef = 504980B31BB29E5B0046A918 /* DWURunLoopWorkDistribution.m */; };
 		506A0C7F1BAD09600084E276 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 506A0C7E1BAD09600084E276 /* main.m */; };
 		506A0C821BAD09600084E276 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 506A0C811BAD09600084E276 /* AppDelegate.m */; };
 		506A0C851BAD09600084E276 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 506A0C841BAD09600084E276 /* ViewController.m */; };
 		506A0C8A1BAD09600084E276 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 506A0C891BAD09600084E276 /* Assets.xcassets */; };
 		506A0C951BAD717A0084E276 /* spaceship.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 506A0C941BAD717A0084E276 /* spaceship.jpg */; };
-		506A0C981BAD77F60084E276 /* DWURunLoopWorkDistribution.m in Sources */ = {isa = PBXBuildFile; fileRef = 506A0C971BAD77F60084E276 /* DWURunLoopWorkDistribution.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		504980B01BB27D190046A918 /* RunLoopWorkDistribution-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RunLoopWorkDistribution-Bridging-Header.h"; sourceTree = "<group>"; };
 		504980B11BB27D190046A918 /* ViewControllerSwift.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewControllerSwift.swift; sourceTree = "<group>"; };
+		504980B31BB29E5B0046A918 /* DWURunLoopWorkDistribution.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DWURunLoopWorkDistribution.m; path = DWURunLoopWorkDistribution/DWURunLoopWorkDistribution.m; sourceTree = "<group>"; };
+		504980B41BB29E5B0046A918 /* DWURunLoopWorkDistribution.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DWURunLoopWorkDistribution.h; path = DWURunLoopWorkDistribution/DWURunLoopWorkDistribution.h; sourceTree = "<group>"; };
 		506A0C7A1BAD09600084E276 /* RunLoopWorkDistribution.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RunLoopWorkDistribution.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		506A0C7E1BAD09600084E276 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		506A0C801BAD09600084E276 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -28,8 +30,6 @@
 		506A0C891BAD09600084E276 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		506A0C8E1BAD09600084E276 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		506A0C941BAD717A0084E276 /* spaceship.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = spaceship.jpg; sourceTree = "<group>"; };
-		506A0C961BAD77F60084E276 /* DWURunLoopWorkDistribution.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWURunLoopWorkDistribution.h; sourceTree = "<group>"; };
-		506A0C971BAD77F60084E276 /* DWURunLoopWorkDistribution.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWURunLoopWorkDistribution.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +62,8 @@
 		506A0C7C1BAD09600084E276 /* RunLoopWorkDistribution */ = {
 			isa = PBXGroup;
 			children = (
+				504980B31BB29E5B0046A918 /* DWURunLoopWorkDistribution.m */,
+				504980B41BB29E5B0046A918 /* DWURunLoopWorkDistribution.h */,
 				506A0C941BAD717A0084E276 /* spaceship.jpg */,
 				506A0C801BAD09600084E276 /* AppDelegate.h */,
 				506A0C811BAD09600084E276 /* AppDelegate.m */,
@@ -70,8 +72,6 @@
 				506A0C891BAD09600084E276 /* Assets.xcassets */,
 				506A0C8E1BAD09600084E276 /* Info.plist */,
 				506A0C7D1BAD09600084E276 /* Supporting Files */,
-				506A0C961BAD77F60084E276 /* DWURunLoopWorkDistribution.h */,
-				506A0C971BAD77F60084E276 /* DWURunLoopWorkDistribution.m */,
 				504980B11BB27D190046A918 /* ViewControllerSwift.swift */,
 				504980B01BB27D190046A918 /* RunLoopWorkDistribution-Bridging-Header.h */,
 			);
@@ -157,7 +157,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				506A0C851BAD09600084E276 /* ViewController.m in Sources */,
-				506A0C981BAD77F60084E276 /* DWURunLoopWorkDistribution.m in Sources */,
+				504980B51BB29E5B0046A918 /* DWURunLoopWorkDistribution.m in Sources */,
 				506A0C821BAD09600084E276 /* AppDelegate.m in Sources */,
 				504980B21BB27D190046A918 /* ViewControllerSwift.swift in Sources */,
 				506A0C7F1BAD09600084E276 /* main.m in Sources */,
