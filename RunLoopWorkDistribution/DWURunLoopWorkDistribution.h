@@ -20,4 +20,6 @@ typedef BOOL(^DWURunLoopWorkDistributionUnit)(void);
 
 - (void)addTask:(DWURunLoopWorkDistributionUnit)unit withKey:(id)key;
 
+- (void)removeAllTasks;
+
 @end

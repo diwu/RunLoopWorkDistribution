@@ -22,6 +22,11 @@
 
 @implementation DWURunLoopWorkDistribution
 
+- (void)removeAllTasks {
+    [self.tasks removeAllObjects];
+    [self.tasksKeys removeAllObjects];
+}
+
 - (void)addTask:(DWURunLoopWorkDistributionUnit)unit withKey:(id)key{
     [self.tasks addObject:unit];
     [self.tasksKeys addObject:key];
