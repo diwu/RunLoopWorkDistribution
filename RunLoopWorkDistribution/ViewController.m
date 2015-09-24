@@ -44,7 +44,10 @@ static CGFloat CELL_HEIGHT = 135.f;
     UIImage *image = [UIImage imageWithContentsOfFile:path];
     imageView.contentMode = UIViewContentModeScaleAspectFit;
     imageView.image = image;
-    [cell.contentView addSubview:imageView];
+    [UIView transitionWithView:cell.contentView duration:0.3 options:UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionTransitionCrossDissolve animations:^{
+        [cell.contentView addSubview:imageView];
+    } completion:^(BOOL finished) {
+    }];
 }
 
 + (void)task_3:(UITableViewCell *)cell indexPath:(NSIndexPath *)indexPath  {
@@ -54,7 +57,10 @@ static CGFloat CELL_HEIGHT = 135.f;
     UIImage *image = [UIImage imageWithContentsOfFile:path];
     imageView.contentMode = UIViewContentModeScaleAspectFit;
     imageView.image = image;
-    [cell.contentView addSubview:imageView];
+    [UIView transitionWithView:cell.contentView duration:0.3 options:UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionTransitionCrossDissolve animations:^{
+        [cell.contentView addSubview:imageView];
+    } completion:^(BOOL finished) {
+    }];
 }
 
 + (void)task_4:(UITableViewCell *)cell indexPath:(NSIndexPath *)indexPath  {
@@ -63,10 +69,9 @@ static CGFloat CELL_HEIGHT = 135.f;
     label.numberOfLines = 0;
     label.backgroundColor = [UIColor clearColor];
     label.textColor = [UIColor colorWithRed:0 green:100.f/255.f blue:0 alpha:1];
-    label.text = [NSString stringWithFormat:@"%zd - Drawing large image is low priority. Should be distributed into different run loop cycles.", indexPath.row];
+    label.text = [NSString stringWithFormat:@"%zd - Drawing large image is low priority. Should be distributed into different run loop passes.", indexPath.row];
     label.font = [UIFont boldSystemFontOfSize:13];
     label.tag = 4;
-    [cell.contentView addSubview:label];
     
     UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(5, 20, 85, 85)];
     imageView.tag = 5;
@@ -74,7 +79,11 @@ static CGFloat CELL_HEIGHT = 135.f;
     UIImage *image = [UIImage imageWithContentsOfFile:path];
     imageView.contentMode = UIViewContentModeScaleAspectFit;
     imageView.image = image;
-    [cell.contentView addSubview:imageView];
+    [UIView transitionWithView:cell.contentView duration:0.3 options:UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionTransitionCrossDissolve animations:^{
+        [cell.contentView addSubview:label];
+        [cell.contentView addSubview:imageView];
+    } completion:^(BOOL finished) {
+    }];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
