@@ -14,8 +14,6 @@ typedef BOOL(^DWURunLoopWorkDistributionUnit)(void);
 
 @property (nonatomic, assign) NSUInteger maximumQueueLength;
 
-+ (void)registerRunLoopWorkDistributionAsMainRunloopObserver:(DWURunLoopWorkDistribution *)runLoopWorkDistribution;
-
 + (instancetype)sharedRunLoopWorkDistribution;
 
 - (void)addTask:(DWURunLoopWorkDistributionUnit)unit withKey:(id)key;

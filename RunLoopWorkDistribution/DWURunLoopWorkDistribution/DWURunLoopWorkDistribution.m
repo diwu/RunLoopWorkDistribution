@@ -37,7 +37,7 @@
     }
 }
 
-- (void)timerFiredMethod:(NSTimer *)timer {
+- (void)_timerFiredMethod:(NSTimer *)timer {
     //We do nothing here
 }
 
@@ -47,7 +47,7 @@
         _maximumQueueLength = 30;
         _tasks = [NSMutableArray array];
         _tasksKeys = [NSMutableArray array];
-        _timer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(timerFiredMethod:) userInfo:nil repeats:YES];
+        _timer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(_timerFiredMethod:) userInfo:nil repeats:YES];
     }
     return self;
 }
@@ -57,14 +57,14 @@
     static dispatch_once_t once;
     dispatch_once(&once, ^{
         singleton = [[DWURunLoopWorkDistribution alloc] init];
-        [self registerRunLoopWorkDistributionAsMainRunloopObserver:singleton];
+        [self _registerRunLoopWorkDistributionAsMainRunloopObserver:singleton];
     });
     return singleton;
 }
 
-+ (void)registerRunLoopWorkDistributionAsMainRunloopObserver:(DWURunLoopWorkDistribution *)runLoopWorkDistribution {
++ (void)_registerRunLoopWorkDistributionAsMainRunloopObserver:(DWURunLoopWorkDistribution *)runLoopWorkDistribution {
     static CFRunLoopObserverRef defaultModeObserver;
-    _registerObserver(kCFRunLoopBeforeWaiting, defaultModeObserver, NSIntegerMax - 999, kCFRunLoopDefaultMode, (__bridge void *)runLoopWorkDistribution, &defaultModeRunLoopWorkDistributionCallback);
+    _registerObserver(kCFRunLoopBeforeWaiting, defaultModeObserver, NSIntegerMax - 999, kCFRunLoopDefaultMode, (__bridge void *)runLoopWorkDistribution, &_defaultModeRunLoopWorkDistributionCallback);
 }
 
 static void _registerObserver(CFOptionFlags activities, CFRunLoopObserverRef observer, CFIndex order, CFStringRef mode, void *info, CFRunLoopObserverCallBack callback) {
@@ -101,7 +101,7 @@ static void _runLoopWorkDistributionCallback(CFRunLoopObserverRef observer, CFRu
     }
 }
 
-static void defaultModeRunLoopWorkDistributionCallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
+static void _defaultModeRunLoopWorkDistributionCallback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
     _runLoopWorkDistributionCallback(observer, activity, info);
 }
 
