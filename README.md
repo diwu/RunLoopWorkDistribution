@@ -19,7 +19,7 @@ Because the high priority passes are often filled with critical time sensitive t
 ##Why not Simply Multi-threading?
 Too many times when we are optimizing cell drawing code in our `cellForRow:` method, we find ourselves buried under a bunch of UIKit APIs that are in no way thread safe. Even worse, some of them could easily block the main thread for one or more precious milliseconds. As facebook AsyncDisplayKit teaches us, "Your code usually has less than ten milliseconds to run before it causes a frame drop". Oops.
 
-##Why Distributing the Work Load? Why Not All at Once?
+##Why Distributing the Work Load?
 So here we are executing low priority tasks on the UI thread while the UI thread is free and is about to sleep, so why not dumping those tasks all at once. The UI thread is not busy at that specific moment anyway.
 
 Here's why: The next RunLoop pass, be it high or low priority, will never start unless the previous one hits the finishing line. As a result, if we dump too much work into the current low priority pass, and suddenly the high priority pass needs to take over (for example, touch events detected), the high priority pass will have to wait for the low priority task to finish before any touch events could be served. And that's when you notice the glitches.
