@@ -1,3 +1,4 @@
+![][demo]
 ##iOS Fast Scrolling with RunLoop Work Distribution
 
 * Go to work when UI thread gets idle. Step aside when UI thread gets busy.
@@ -38,3 +39,5 @@ Simply copy and paste `DWURunLoopWorkDistribution.{h,m}` into your project. Or, 
 You can submit tasks by calling `addTask:withKey:`. In the case of `cellForRow:`, the key will be the `NSIndexPath` instance of that specific cell.
 
 Since cells are regularly reused within a given tableView, be sure to set the `currentIndexPath` property of your cell and check its value against the indexPath captured by the task block to make sure you are not executing a task that should be abandoned. Cannot find the `currentIndexPath` property anywhere in the document? No worry, it's not there because it's not from Apple. It's a dynamic property injected into every UITableViewCell instance during runtime by `DWURunLoopWorkDistribution`.
+
+[demo]: https://raw.githubusercontent.com/diwu/ui-markdown-store/master/DWURunLoopWorkDistribution_demo.gif
