@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/diwu/RunLoopWorkDistribution.svg?branch=master)](https://travis-ci.org/diwu/RunLoopWorkDistribution)
+
 ![][demo]
 ##iOS Fast Scrolling with RunLoop Work Distribution
 
