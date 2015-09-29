@@ -14,7 +14,7 @@
 RunLoop is a `while(YES){...}` loop that lives within your app's UI thread. It handles all kinds of events when your app is busy, while sleeps like a baby when there's nothing to do, until the next event wakes it up.
 
 ##Not All RunLoop Passes are Created Equal
-A RunLoop repeats itself as individual passes (For those who are interested, those are called *RunLoop Modes*). However, not all passes are created equal. High priority passes take over when your app is tracking finger movements, while low priority passes begin to run when scrolling comes to an end and the metal has spare time to work on low priority tasks such as processing networking data.
+A RunLoop repeats itself as individual passes. However, not all passes are created equal. High priority passes take over when your app is tracking finger movements, while low priority passes begin to run when scrolling comes to an end and the metal has spare time to work on low priority tasks such as processing networking data.
 
 Because the high priority passes are often filled with critical time sensitive tasks. We don't want to interfere with that. So here in this project we are only working in those low priority passes. Focusing on a single type of passes also gives us one huge advantage: all tasks we submit to this type of passes are guaranteed to run on a first-in-first-out sequential basis.
 
@@ -29,14 +29,17 @@ Here's why: The next RunLoop pass, be it high or low priority, will never start 
 If instead we slice our one big low priority task into smaller pieces, things would look much much different. Whenever high priority passes need to take over, they won't wait for long because every low priority task is now smaller and will be finished in no time. Hence the "Step aside when UI thread gets busy." 
 
 ##Example
-Along with the source code there's an contrived example illustrating the technique. In the example there's a heavy task that loads and draws 3 big JPG files into the cell's contentView whenever a new cell goes onto the screen. If we follow the convention and load and draw the images right inside the `cellForRow:` callback, significant glitches will ensue, since loading and drawing each image takes quite some milliseconds even in a simulator. 
+Along with the source code there's an contrived example illustrating the technique. In the example there's a heavy task that loads and draws 3 big JPG files into the cell's contentView whenever a new cell goes onto the screen. If we follow the convention and load and draw the images right inside the `cellForRow:` callback, glitches will ensue, since loading and drawing each image takes quite some time even in a simulator. 
 
-So instead of doing it the old way, we slice our big task into 3 smaller ones, each loading and drawing 1 image. Then we submit the 3 tasks into the low priority tasks queue with the help of `DWURunLoopWorkDistribution`. Running the example, we can see that glitches are much less frequent now. And instead of loading and drawing images for every cell that shows up during scrolling, only certain cells now get to do the heavy task, making the whole scrolling process more efficient.
+So instead of doing it the old way, we slice our big task into 3 smaller ones, each loading and drawing 1 image. Then we submit the 3 tasks into the low priority tasks queue with the help of `DWURunLoopWorkDistribution`. Running the example, we can see that glitches are much less frequent now. Besides, instead of loading and drawing images for every indexPath that comes and goes during scrolling, only certain indexPaths now get to do the work, making the whole scrolling process more efficient.
 
-##Usage
+##Installation
+
 Simply copy and paste `DWURunLoopWorkDistribution.{h,m}` into your project. Or, if you prefer, add the following line into your Podfile.
 
 `pod 'DWURunLoopWorkDistribution'` 
+
+##Usage
 
 You can submit tasks by calling `addTask:withKey:`. In the case of `cellForRow:`, the key will be the `NSIndexPath` instance of that specific cell.
 
