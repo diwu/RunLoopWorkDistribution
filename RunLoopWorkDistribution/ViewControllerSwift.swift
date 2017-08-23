@@ -9,9 +9,9 @@
 import UIKit
 
 class ViewControllerSwift: UIViewController, UITableViewDelegate, UITableViewDataSource {
-    private var exampleTableView: UITableView?
-    private static let IDENTIFIER = "IDENTIFIER"
-    private static let CELL_HEIGHT: CGFloat = 135.0
+    fileprivate var exampleTableView: UITableView?
+    fileprivate static let IDENTIFIER = "IDENTIFIER"
+    fileprivate static let CELL_HEIGHT: CGFloat = 135.0
     override func loadView() {
         view = UIView()
         exampleTableView = UITableView()
@@ -19,41 +19,41 @@ class ViewControllerSwift: UIViewController, UITableViewDelegate, UITableViewDat
         exampleTableView?.dataSource = self
         view.addSubview(exampleTableView!)
     }
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         exampleTableView?.frame = view.bounds
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        exampleTableView?.registerClass(UITableViewCell.self, forCellReuseIdentifier: ViewControllerSwift.IDENTIFIER)
+        exampleTableView?.register(UITableViewCell.self, forCellReuseIdentifier: ViewControllerSwift.IDENTIFIER)
     }
-    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return ViewControllerSwift.CELL_HEIGHT
     }
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell: UITableViewCell = tableView.dequeueReusableCellWithIdentifier(ViewControllerSwift.IDENTIFIER)!
-        cell.selectionStyle = .None
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell: UITableViewCell = tableView.dequeueReusableCell(withIdentifier: ViewControllerSwift.IDENTIFIER)!
+        cell.selectionStyle = .none
         cell.currentIndexPath = indexPath
         ViewController.task_5(cell, indexPath: indexPath)
         ViewController.task_1(cell, indexPath: indexPath)
-        DWURunLoopWorkDistribution.sharedRunLoopWorkDistribution().addTask({ () -> Bool in
-            if cell.currentIndexPath .isEqual(indexPath) == false {
+        DWURunLoopWorkDistribution.shared().addTask({ () -> Bool in
+            if cell.currentIndexPath != indexPath {
                 return false
             } else {
                 ViewController.task_2(cell, indexPath: indexPath)
                 return true
             }
         }, withKey: indexPath)
-        DWURunLoopWorkDistribution.sharedRunLoopWorkDistribution().addTask({ () -> Bool in
-            if cell.currentIndexPath .isEqual(indexPath) == false {
+        DWURunLoopWorkDistribution.shared().addTask({ () -> Bool in
+            if cell.currentIndexPath != indexPath {
                 return false
             } else {
                 ViewController.task_3(cell, indexPath: indexPath)
                 return true
             }
             }, withKey: indexPath)
-        DWURunLoopWorkDistribution.sharedRunLoopWorkDistribution().addTask({ () -> Bool in
-            if cell.currentIndexPath .isEqual(indexPath) == false {
+        DWURunLoopWorkDistribution.shared().addTask({ () -> Bool in
+            if cell.currentIndexPath != indexPath {
                 return false
             } else {
                 ViewController.task_4(cell, indexPath: indexPath)
@@ -62,7 +62,7 @@ class ViewControllerSwift: UIViewController, UITableViewDelegate, UITableViewDat
             }, withKey: indexPath)
         return cell;
     }
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 399
     }
 
